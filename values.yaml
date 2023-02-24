@@ -3,7 +3,7 @@
 # Declare variables to be passed into your templates.
 
 replicaCount: 2
-
+app_name: espresso-shop-web
 image:
   repository: devopseasylearning2021/s3-project01-espresso-shop
   pullPolicy: IfNotPresent
@@ -77,3 +77,8 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+strategy:
+  type: RollingUpdate
+  rollingUp: 50%
+

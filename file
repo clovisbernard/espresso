@@ -1,4 +1,15 @@
 ---
+# Source: espresso/templates/pdb.yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: espresso-shop-web
+spec:
+  maxUnavailable: 2
+  selector:
+    matchLabels:
+      app: espresso-shop-web
+---
 # Source: espresso/templates/serviceaccount.yaml
 apiVersion: v1
 kind: ServiceAccount
@@ -19,6 +30,8 @@ kind: Service
 metadata:
   name: release-name-espresso
   labels:
+    app: espresso-shop-web
+    deploy: espresso
     helm.sh/chart: espresso-0.1.0
     app.kubernetes.io/name: espresso
     app.kubernetes.io/instance: release-name
@@ -27,27 +40,34 @@ metadata:
 spec:
   type: NodePort
   ports:
-    - port: 80
-      targetPort: http
+    - port: 8090
+      targetPort: 80
       protocol: TCP
       name: http
   selector:
     app.kubernetes.io/name: espresso
     app.kubernetes.io/instance: release-name
+    app: espresso-shop-web
+    deploy: espresso
 ---
 # Source: espresso/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: release-name-espresso
+  name: espresso-shop-web
   labels:
     helm.sh/chart: espresso-0.1.0
     app.kubernetes.io/name: espresso
     app.kubernetes.io/instance: release-name
     app.kubernetes.io/version: "1.16.0"
     app.kubernetes.io/managed-by: Helm
+    app: espresso-shop-web
+    deploy: espresso
 spec:
   replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUp      maxSurge: 50%
   selector:
     matchLabels:
       app.kubernetes.io/name: espresso
@@ -69,7 +89,7 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
-              containerPort: 80
+              containerPort: 8090
               protocol: TCP
           livenessProbe:
             httpGet:
@@ -129,4 +149,4 @@ spec:
               service:
                 name: release-name-espresso
                 port:
-                  number: 80
+                  number: 8090
