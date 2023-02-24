@@ -1,9 +1,11 @@
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: espresso-shop-web
+  name: {{ .Values.app_name }}
+  labels:
+    app: {{ .Values.labels.app }}
 spec:
-  maxUnavailable: 2
+  maxUnavailable: {{ .Values.podDisruptionBudget }}
   selector:
     matchLabels:
-      app: espresso-shop-web
+       app: {{ .Values.labels.app }}
