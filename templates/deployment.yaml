@@ -1,13 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "espresso.fullname" . }}
+  name: {{ .Values.app_name }}
   labels:
     {{- include "espresso.labels" . | nindent 4 }}
+    app: espresso-shop-web
+    deploy: espresso
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
+  strategy:
+    type: {{.Values.strategy.type }}
+    rollingUp      maxSurge: {{.Values.strategy.rollingUp }}
   selector:
     matchLabels:
       {{- include "espresso.selectorLabels" . | nindent 6 }}
