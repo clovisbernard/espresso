@@ -1,19 +1,17 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "espresso.fullname" . }}
+  name: {{ .Values.app_name }}-svc
   labels:
-    app: espresso-shop-web
-    deploy: espresso
-    {{- include "espresso.labels" . | nindent 4 }}
+        app: {{ .Values.labels.app }}
 spec:
   type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.service.port }}
       targetPort: {{ .Values.service.targetPort }}
+      nodePort: {{ .Values.service.nodePort }}
       protocol: TCP
       name: http
   selector:
-    {{- include "espresso.selectorLabels" . | nindent 4 }}
-    app: espresso-shop-web
-    deploy: espresso
+        app: {{ .Values.labels.app }}
+
